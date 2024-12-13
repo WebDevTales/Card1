@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Code Preview Template</title>
+    <style>
+        /* General Reset */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #ffffff;
+        }
+        .container {
+            position: relative;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f43676;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .preview {
+            border: 10px solid #002050;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        .preview iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+        .get-code-btn {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background: #002050;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .get-code-btn:hover {
+            background: #1c4075;
+            color: #f43676;
+        }
+        /* Modal Styling */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
+        }
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 600px;
+            background: #2a2a40;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f43676;
+            padding: 10px 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .modal-header button {
+            background: none;
+            border: none;
+            color: #002050;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .modal-header button:hover {
+            color: #ffffff;
+        }
+        .tabs {
+            display: flex;
+            background: #3c3c5e;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background: #f43676;
+            border: 2px solid #002050;
+            color: #ffffff;
+            transition: background 0.3s, color 0.3s;
+        }
+        .tab.active {
+            background: #002050;
+            color: #fff;
+        }
+        .code-area {
+            display: none;
+            padding: 20px;
+            background: #1e1e2f;
+            color: #fff;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        pre {
+            margin: 0; /* Remove default margin */
+        }
+
+        code {
+            color: #f8f8f2; /* Default text color */
+        }
+
+        .code-area.active {
+            display: block;
+        }
+
+
+        .copy-btn {
+        background: none;
+        border: none;
+        color: #f43676;
+        font-size: 22px;
+        cursor: pointer;
+        margin-right: 10px;
+        position: relative;
+    }
+
+    .copy-btn:hover {
+        color: #ffffff;
+    }
+
+    .copy-btn i {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .copy-btn:hover i {
+        transform: scale(1.2);
+    }
+
+    .notification {
+        display: inline-block;
+        margin-left: 10px;
+        opacity: 0;
+        visibility: hidden;
+        color: white;
+        background: #f43676;
+        padding: 5px 10px;
+        font-size: 14px;
+        transition: all 0.3s ease-in-out;
+        position: relative;
+        top: -3px;
+    }
+
+    .notification.show {
+        opacity: 1;
+        visibility: visible;
+        animation: slide-in 0.5s forwards;
+    }
+
+    @keyframes slide-in {
+        from {
+            transform: translateX(50%);
+        }
+        to {
+            transform: translateX(0);
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="get-code-btn">
+            <i class="fas fa-code"></i> Get Code
+        </button>
+        <div class="preview">
+            <iframe id="preview-frame" srcdoc="<style>body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e0e0e0; /* Light background for neomorphism */
+            margin: 0;
+        }
+
+        .container {
+            width: 80vw; /* 8 units */
+            height: 60vh; /* 6 units */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 200px;
+            height: 300px;
+            Color: #333 !important;
+            background: #e0e0e0; /* Card background */
+            border-radius: 20px;
+            box-shadow: 8px 8px 15px #a3a3a3, 
+                        -8px -8px 15px #ffffff; /* Neomorphic shadow */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        h2 {
+            display: block !important;
+            margin: 0;
+            color: #333 !important;
+            z-index: 2;
+        }
+
+        ul { 
+            display: block !important;
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0 0 0;
+            color: #555 !important;
+            z-index: 2;
+        }
+
+        li {
+            margin: 10px 0;
+            z-index: 2;
+        }
+    </style>
+    <div class='container'>
+        <div class='card' >
+            <h2>Ultra Pro Level</h2>
+            <ul>
+                <li>Feature 1</li>
+                <li>Feature 2</li>
+                <li>Feature 3</li>
+                <li>Feature 4</li>
+            </ul>
+        </div>
+    </div>">
+</iframe>
+
+        </div>
+    </div>
+
+    <div class="modal" id="code-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Get the Code</h2>
+                <button id="close-modal">&times;</button>
+            </div>
+            <div class="tabs">
+                <div class="tab active" data-tab="html-code">HTML</div>
+                <div class="tab" data-tab="css-code">CSS</div>
+                <div class="tab" data-tab="js-code">JavaScript</div>
+            </div>
+            <div class="code-area active" id="html-code">
+                <button class="copy-btn" data-clipboard-target="#html-code">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="notification" id="html-notification">Code copied!</div>
+                <pre><code class="language-html">&lt;div class="container"&gt;
+                &lt;div class="card"&gt;
+                    &lt;h2&gt;Ultra Pro Level&lt;/h2&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Feature 1&lt;/li&gt;
+                        &lt;li&gt;Feature 2&lt;/li&gt;
+                        &lt;li&gt;Feature 3&lt;/li&gt;
+                        &lt;li&gt;Feature 4&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</code></pre>
+            </div>
+            
+            <div class="code-area" id="css-code">
+                <button class="copy-btn" data-clipboard-target="#css-code">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="notification" id="css-notification">Code copied!</div>
+                <pre><code class="language-css">body &lbrace;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    background-color: #e0e0e0; /* Light background for neomorphism */
+                    margin: 0;
+                &rbrace;
+            
+                .container &lbrace;
+                    width: 80vw; /* 8 units */
+                    height: 60vh; /* 6 units */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                &rbrace;
+            
+                .card &lbrace;
+                    width: 300px;
+                    height: 400px;
+                    background: #e0e0e0; /* Card background */
+                    border-radius: 20px;
+                    box-shadow: 8px 8px 15px #a3a3a3, 
+                                -8px -8px 15px #ffffff; /* Neomorphic shadow */
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                &rbrace;
+            
+                h2 &lbrace;
+                    margin: 0;
+                    color: #333;
+                &rbrace;
+            
+                ul &lbrace;
+                    list-style-type: none;
+                    padding: 0;
+                    margin: 20px 0 0 0;
+                    color: #555;
+                &rbrace;
+            
+                li &lbrace;
+                    margin: 10px 0;
+                &rbrace;</code></pre>
+                
+            </div>
+            <div class="code-area" id="js-code">
+                // Insert your JavaScript code here
+                console.log('Hello, world!');
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const getCodeBtn = document.querySelector('.get-code-btn');
+        const modal = document.getElementById('code-modal');
+        const closeModal = document.getElementById('close-modal');
+        const tabs = document.querySelectorAll('.tab');
+        const codeAreas = document.querySelectorAll('.code-area');
+
+        // Open Modal
+        getCodeBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        // Close Modal
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // Tab Switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                codeAreas.forEach(area => area.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+
+        document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const targetSelector = btn.getAttribute('data-clipboard-target');
+        const codeToCopy = btn.parentElement.querySelector('code').innerText;
+
+        // Copy code to clipboard
+        navigator.clipboard.writeText(codeToCopy).then(() => {
+            const notification = btn.parentElement.querySelector('.notification');
+            if (notification) {
+                notification.classList.add('show');
+
+                // Remove the notification after 2 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            }
+        });
+    });
+});
+
+    </script>
+</body>
+</html>
